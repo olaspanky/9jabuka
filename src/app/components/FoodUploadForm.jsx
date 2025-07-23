@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { uploadFood } from '../lib/api';
 import { useState } from 'react';
 import { Upload, Image, DollarSign, Clock, Tag, FileText, ChefHat, Check, AlertCircle, X } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function FoodUploadForm() {
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
@@ -15,7 +16,7 @@ export default function FoodUploadForm() {
   const watchedImage = watch('image');
 
   // Handle image preview
-  React.useEffect(() => {
+useEffect(() => {
     if (watchedImage && watchedImage[0]) {
       const file = watchedImage[0];
       const reader = new FileReader();
@@ -77,8 +78,8 @@ export default function FoodUploadForm() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-800 via-red-900 to-orange-900 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen w-[100vw] bg-gradient-to-br from-green-800 via-red-900 to-orange-900 py-12 px-4">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-3 mb-4">
