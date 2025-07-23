@@ -736,14 +736,7 @@ const FoodOrderingSystem = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              {isAdmin && (
-                <button
-                  onClick={() => setShowAdminPanel(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-semibold transition-all duration-300"
-                >
-                  Admin Panel
-                </button>
-              )}
+             
               <button
                 onClick={() => setShowCart(true)}
                 className="relative bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full flex items-center space-x-3 transition-all duration-300 hover:scale-105 shadow-lg"
