@@ -736,6 +736,7 @@ const FoodOrderingSystem = () => {
             </div>
 
             <div className="flex items-center space-x-4">
+             o
              
               <button
                 onClick={() => setShowCart(true)}

@@ -2,9 +2,8 @@
 
 import { useForm } from 'react-hook-form';
 import { uploadFood } from '../lib/api';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, Image, DollarSign, Clock, Tag, FileText, ChefHat, Check, AlertCircle, X } from 'lucide-react';
-import { useEffect } from 'react';
 
 export default function FoodUploadForm() {
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
@@ -16,7 +15,7 @@ export default function FoodUploadForm() {
   const watchedImage = watch('image');
 
   // Handle image preview
-useEffect(() => {
+  useEffect(() => {
     if (watchedImage && watchedImage[0]) {
       const file = watchedImage[0];
       const reader = new FileReader();
@@ -63,18 +62,19 @@ useEffect(() => {
     }
   };
 
+  // Updated categories
   const categories = [
-    'Main Course',
-    'Appetizer',
-    'Soup',
-    'Rice Dishes',
-    'Grilled',
-    'Seafood',
-    'Vegetarian',
-    'Dessert',
-    'Beverages',
-    'Traditional',
-    'Street Food'
+    'Mains',
+    'Combination Platter',
+    'Beans',
+    'Soups & Swallow',
+    'Sides',
+    'Chef Specialties',
+    'Pepper Soup',
+    'Pastries',
+    'Drinks',
+    'Breakfast Menu',
+    'Frozen Soup'
   ];
 
   return (
