@@ -1,11 +1,10 @@
-// pages/success.js
 "use client";
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 
 const SuccessPage = () => {
-  const router = useRouter();
-  const { session_id } = router.query;
+  const params = useParams();
+  const session_id = params.sessionId; // Adjust based on your dynamic route structure
 
   useEffect(() => {
     if (session_id) {
@@ -19,7 +18,7 @@ const SuccessPage = () => {
           console.log('Order placed:', data);
         })
         .catch(err => console.error('Error placing order:', err));
-    }
+      }
   }, [session_id]);
 
   return (
