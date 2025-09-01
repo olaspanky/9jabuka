@@ -26,6 +26,18 @@ export const getFoods = async () => {
   return response.data;
 };
 
+export const getFoodById = async (id) => {
+  const response = await api.get(`/foods/${id}`);
+  return response.data;
+};
+
+export const updateFood = async (id, formData) => {
+  const response = await api.put(`/foods/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+};
+
 export const placeOrder = async (orderData) => {
   const response = await api.post('/orders/place', orderData);
   return response.data;

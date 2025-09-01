@@ -1,69 +1,24 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { uploadFood } from '../lib/api';
 import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { Upload, Image, DollarSign, Clock, Tag, FileText, ChefHat, Check, AlertCircle, X } from 'lucide-react';
-import Link from 'next/link';
+import { updateFood, getFoodById } from '../lib/api'; // Assume getFoodById fetches food item by ID
 
-export default function FoodUploadForm() {
-  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
+export default function FoodUpdateForm() {
+  const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm();
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const { id } = useParams(); // Get food ID from URL params (Next.js)
+  const router = useRouter();
 
   const watchedImage = watch('image');
 
-  // Handle image preview
-  useEffect(() => {
-    if (watchedImage && watchedImage[0]) {
-      const file = watchedImage[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setImagePreview(null);
-    }
-  }, [watchedImage]);
-
-  const onSubmit = async (data) => {
-    try {
-      setIsUploading(true);
-      setError(null);
-      setSuccess(null);
-
-      const formData = new FormData();
-      formData.append('name', data.name);
-      formData.append('description', data.description);
-      formData.append('price', data.price);
-      formData.append('category', data.category);
-      formData.append('cookingTime', data.cookingTime);
-      
-      if (data.image[0]) {
-        formData.append('image', data.image[0]);
-      } else {
-        throw new Error('No image selected');
-      }
-
-      console.log('Sending form data:', Object.fromEntries(formData));
-      const response = await uploadFood(formData);
-      setSuccess('Food item uploaded successfully! Your delicious dish is now available on 9jabuka.');
-      setError(null);
-      setImagePreview(null);
-      reset();
-    } catch (err) {
-      console.error('Frontend error:', err);
-      setError(err.response?.data?.message || 'Failed to upload food item. Please try again.');
-      setSuccess(null);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  // Updated categories
+  // Categories (consistent with FoodUploadForm)
   const categories = [
     'Mains',
     'Combination Platter',
@@ -75,8 +30,84 @@ export default function FoodUploadForm() {
     'Pastries',
     'Drinks',
     'Breakfast Menu',
-    'Frozen Soup'
+    'Frozen Soup',
   ];
+
+  // Fetch food item data on mount
+  useEffect(() => {
+    const fetchFood = async () => {
+      try {
+        setIsLoading(true);
+        const food = await getFoodById(id);
+        // Populate form with existing data
+        setValue('name', food.name);
+        setValue('description', food.description);
+        setValue('price', food.price);
+        setValue('category', food.category);
+        setValue('cookingTime', food.cookingTime);
+        setImagePreview(food.imageUrl); // Set initial image preview
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error fetching food item:', err);
+        setError('Failed to load food item. Please try again.');
+        setIsLoading(false);
+      }
+    };
+    fetchFood();
+  }, [id, setValue]);
+
+  // Handle image preview
+  useEffect(() => {
+    if (watchedImage && watchedImage[0]) {
+      const file = watchedImage[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else if (!watchedImage) {
+      // Reset to original image if no new image is selected
+      getFoodById(id).then(food => setImagePreview(food.imageUrl)).catch(() => {});
+    }
+  }, [watchedImage, id]);
+
+  const onSubmit = async (data) => {
+    try {
+      setIsUpdating(true);
+      setError(null);
+      setSuccess(null);
+
+      const formData = new FormData();
+      if (data.name) formData.append('name', data.name);
+      if (data.description) formData.append('description', data.description);
+      if (data.price) formData.append('price', data.price);
+      if (data.category) formData.append('category', data.category);
+      if (data.cookingTime) formData.append('cookingTime', data.cookingTime);
+      if (data.image && data.image[0]) {
+        formData.append('image', data.image[0]);
+      }
+
+      console.log('Sending form data:', Object.fromEntries(formData));
+      const response = await updateFood(id, formData);
+      setSuccess('Food item updated successfully! The dish has been updated on 9jabuka.');
+      setError(null);
+      setTimeout(() => router.push('/admin/food'), 2000); // Redirect to food list after success
+    } catch (err) {
+      console.error('Frontend error:', err);
+      setError(err.response?.data?.message || 'Failed to update food item. Please try again.');
+      setSuccess(null);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen w-[100vw] bg-gradient-to-br from-green-800 via-red-900 to-orange-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-[100vw] bg-gradient-to-br from-green-800 via-red-900 to-orange-900 py-12 px-4">
@@ -90,31 +121,20 @@ export default function FoodUploadForm() {
               <p className="text-sm text-white/80">Admin Panel</p>
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Add New Dish</h2>
-          <p className="text-white/80">Share the authentic taste of Nigeria with our customers</p>
+          <h2 className="text-2xl font-bold text-white mb-2">Update Dish</h2>
+          <p className="text-white/80">Edit the details of this dish to keep the menu fresh</p>
         </div>
 
         {/* Main Form Card */}
         <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
           {/* Form Header */}
-          <div className="bg-gradient-to-r from-green-600 to-emerald-700 p-6 text-white flex justify-between">
+          <div className="bg-gradient-to-r from-green-600 to-emerald-700 p-6 text-white">
             <div className="flex items-center space-x-3">
               <ChefHat className="w-8 h-8" />
               <div>
-                <h3 className="text-xl font-bold">Upload Food Item</h3>
-                <p className="text-green-100">Fill in the details below to add a new dish to the menu</p>
+                <h3 className="text-xl font-bold">Update Food Item</h3>
+                <p className="text-green-100">Modify the details below to update this dish</p>
               </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Link href="/admin/foodlist" className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl font-semibold transition">
-
-              <ChefHat className="w-8 h-8" />
-              <div>
-                <h3 className="text-xl font-bold">update Food Item</h3>
-                <p className="text-green-100">Fill in the details below to add a new dish to the menu</p>
-              </div>
-                          </Link>
-
             </div>
           </div>
 
@@ -160,7 +180,7 @@ export default function FoodUploadForm() {
                         type="button"
                         onClick={() => {
                           setImagePreview(null);
-                          reset({ ...watch(), image: null });
+                          setValue('image', null);
                         }}
                         className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
                       >
@@ -173,7 +193,7 @@ export default function FoodUploadForm() {
                       id="image"
                       type="file"
                       accept="image/jpeg,image/jpg,image/png"
-                      {...register('image', { required: 'Please select an image for your dish' })}
+                      {...register('image')}
                       className="hidden"
                     />
                     <label
@@ -181,7 +201,7 @@ export default function FoodUploadForm() {
                       className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-green-500 transition-colors bg-gray-50 hover:bg-green-50"
                     >
                       <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                      <span className="text-sm font-medium text-gray-600">Click to upload image</span>
+                      <span className="text-sm font-medium text-gray-600">Click to upload new image (optional)</span>
                       <span className="text-xs text-gray-500">JPEG, PNG (Max 5MB)</span>
                     </label>
                   </div>
@@ -207,7 +227,6 @@ export default function FoodUploadForm() {
                     type="text"
                     placeholder="e.g., Jollof Rice with Chicken"
                     {...register('name', { 
-                      required: 'Dish name is required',
                       minLength: { value: 2, message: 'Name must be at least 2 characters' }
                     })}
                     className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-gray-900 placeholder-gray-500"
@@ -233,7 +252,6 @@ export default function FoodUploadForm() {
                     min="0"
                     placeholder="15.99"
                     {...register('price', { 
-                      required: 'Price is required', 
                       min: { value: 0.01, message: 'Price must be greater than $0' },
                       max: { value: 999.99, message: 'Price must be less than $1000' }
                     })}
@@ -258,7 +276,7 @@ export default function FoodUploadForm() {
                   </label>
                   <select
                     id="category"
-                    {...register('category', { required: 'Please select a category' })}
+                    {...register('category')}
                     className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-gray-900"
                   >
                     <option value="">Select a category...</option>
@@ -287,7 +305,6 @@ export default function FoodUploadForm() {
                     max="300"
                     placeholder="25"
                     {...register('cookingTime', { 
-                      required: 'Cooking time is required', 
                       min: { value: 1, message: 'Cooking time must be at least 1 minute' },
                       max: { value: 300, message: 'Cooking time must be less than 5 hours' }
                     })}
@@ -313,7 +330,6 @@ export default function FoodUploadForm() {
                   rows="4"
                   placeholder="Describe your delicious Nigerian dish... Include ingredients, preparation style, and what makes it special."
                   {...register('description', { 
-                    required: 'Description is required',
                     minLength: { value: 10, message: 'Description must be at least 10 characters' },
                     maxLength: { value: 500, message: 'Description must be less than 500 characters' }
                   })}
@@ -338,18 +354,18 @@ export default function FoodUploadForm() {
                 <button
                   type="button"
                   onClick={handleSubmit(onSubmit)}
-                  disabled={isUploading}
+                  disabled={isUpdating}
                   className="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 disabled:from-gray-400 disabled:to-gray-500 text-white py-4 px-6 rounded-2xl font-bold transition-all duration-300 hover:scale-105 disabled:scale-100 shadow-lg flex items-center justify-center space-x-3 text-lg"
                 >
-                  {isUploading ? (
+                  {isUpdating ? (
                     <>
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      <span>Uploading...</span>
+                      <span>Updating...</span>
                     </>
                   ) : (
                     <>
                       <Upload className="w-5 h-5" />
-                      <span>Add Dish to Menu</span>
+                      <span>Update Dish</span>
                     </>
                   )}
                 </button>
@@ -361,9 +377,9 @@ export default function FoodUploadForm() {
         {/* Additional Info */}
         <div className="mt-8 text-center">
           <p className="text-white/70 text-sm">
-            Make sure your images are high quality and show the dish clearly. 
+            Update images with high-quality visuals to keep the menu appealing. 
             <br />
-            This helps customers make better choices and increases orders!
+            This helps customers make better choices and boosts orders!
           </p>
         </div>
       </div>
