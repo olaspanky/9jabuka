@@ -19,11 +19,53 @@ const createCheckoutSession = async (orderData) => {
     },
     body: JSON.stringify(orderData),
   });
-  const result = await response.json(); // Always parse the response
+  const result = await response.json();
   if (!response.ok) {
     throw new Error(result.message || 'Failed to create checkout session');
   }
   return result;
+};
+
+// Valid ZIP codes around Newark, NJ
+const VALID_ZIP_CODES = [
+  '07102', '07103', '07104', '07105', '07106', '07107', '07108', '07112', '07114', // Newark
+  '07111', // Irvington
+  '07017', '07018', // East Orange
+  '07029', // Harrison
+];
+
+// Restaurant locations
+const RESTAURANT_LOCATIONS = [
+  '666 Springfield Ave, Newark, NJ 07103',
+  '891-899 Clinton Ave, Irvington, NJ 07111',
+];
+
+// Placeholder function to calculate distance (replace with actual API call)
+const calculateDistance = async (userAddress, restaurantLocations) => {
+  // Mock distance calculation (in miles) - replace with Google Maps Distance Matrix API
+  // For demonstration, assume distances based on ZIP code
+  const zipToDistance = {
+    '07103': 0, // Same as Springfield Ave
+    '07111': 2, // Close to Clinton Ave
+    '07102': 1,
+    '07104': 2,
+    '07105': 3,
+    '07106': 2.5,
+    '07107': 2,
+    '07108': 1.5,
+    '07112': 2,
+    '07114': 3,
+    '07017': 3.5,
+    '07018': 3.5,
+    '07029': 4,
+  };
+
+  const userZip = userAddress.match(/\b\d{5}\b/)?.[0]; // Extract ZIP code
+  const distance = zipToDistance[userZip] || 5; // Default to 5 miles if ZIP not found
+
+  // Calculate delivery fee: $2 base + $1 per mile
+  const deliveryFee = (2 + distance).toFixed(2);
+  return { distance, deliveryFee };
 };
 
 const FoodOrderingSystem = () => {
@@ -39,7 +81,11 @@ const FoodOrderingSystem = () => {
   const [orderSuccess, setOrderSuccess] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const [deliveryFee, setDeliveryFee] = useState(3.99); // Dynamic delivery fee
+  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
+
+  // Watch ZIP code for real-time validation and fee calculation
+  const zipCode = watch('zipCode');
 
   // Fetch food items from backend
   useEffect(() => {
@@ -68,6 +114,23 @@ const FoodOrderingSystem = () => {
     };
     fetchFoods();
   }, []);
+
+  // Calculate delivery fee when ZIP code changes
+  useEffect(() => {
+    const updateDeliveryFee = async () => {
+      if (zipCode && VALID_ZIP_CODES.includes(zipCode)) {
+        const userAddress = `Newark, NJ ${zipCode}`; // Simplified for demo
+        try {
+          const { deliveryFee } = await calculateDistance(userAddress, RESTAURANT_LOCATIONS);
+          setDeliveryFee(parseFloat(deliveryFee));
+          setError(null);
+        } catch (err) {
+          setError('Failed to calculate delivery fee');
+        }
+      }
+    };
+    updateDeliveryFee();
+  }, [zipCode]);
 
   // Filter foods based on category and search term
   useEffect(() => {
@@ -119,9 +182,14 @@ const FoodOrderingSystem = () => {
 
   const onCheckoutSubmit = async (data) => {
     try {
+      // Validate ZIP code
+      if (!VALID_ZIP_CODES.includes(data.zipCode)) {
+        throw new Error('Delivery is not available to this ZIP code');
+      }
+
       const orderData = {
         items: cart.map(item => ({
-          food: item.id, // Change 'id' to 'food' to match backend validation
+          food: item.id,
           name: item.name,
           description: item.description,
           price: item.price,
@@ -129,6 +197,7 @@ const FoodOrderingSystem = () => {
         })),
         mobileNumber: data.mobileNumber,
         deliveryLocation: `${data.streetAddress}, ${data.city}, ${data.zipCode}`,
+        deliveryFee: deliveryFee, // Include dynamic delivery fee
       };
 
       // Create Stripe Checkout session
@@ -154,29 +223,21 @@ const FoodOrderingSystem = () => {
   return (
     <Elements stripe={stripePromise}>
       <div className="min-h-screen bg-gray-50">
-        {/* Professional Header */}
+        {/* Header unchanged */}
         <header className="bg-white shadow-sm border-b fixed w-full z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
-              {/* Logo and Brand */}
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">9J</span>
-                </div>
+               
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">9jabuka</h1>
-                  <p className="text-xs text-gray-500 hidden sm:block">Authentic Nigerian Cuisine</p>
+                 <img src="/9ja.png" alt="9jabuka Logo" className="h-8 w-auto" />
                 </div>
               </div>
-
-              {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center space-x-8">
                 <a href="#menu" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Menu</a>
-                <a href="#about" className="text-gray-700 hover:text-green-600 font-medium transition-colors">About</a>
+                <a href="/pages/catering" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Reservation and catering</a>
                 <a href="#contact" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Contact</a>
               </nav>
-
-              {/* Search Bar - Desktop */}
               <div className="hidden lg:flex flex-1 max-w-md mx-8">
                 <div className="relative w-full">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -189,8 +250,6 @@ const FoodOrderingSystem = () => {
                   />
                 </div>
               </div>
-
-              {/* Cart Button */}
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => setShowCart(true)}
@@ -204,8 +263,6 @@ const FoodOrderingSystem = () => {
                     </span>
                   )}
                 </button>
-
-                {/* Mobile Menu Button */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                   className="md:hidden p-2 text-gray-600 hover:text-gray-900"
@@ -215,8 +272,6 @@ const FoodOrderingSystem = () => {
               </div>
             </div>
           </div>
-
-          {/* Mobile Menu */}
           {mobileMenuOpen && (
             <div className="md:hidden bg-white border-t">
               <div className="px-4 py-3 space-y-3">
@@ -277,7 +332,6 @@ const FoodOrderingSystem = () => {
         {/* Main Content */}
         <main className="pt-16" id="menu">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* Hero Section */}
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-gray-900 mb-4">
                 Authentic Nigerian Cuisine
@@ -286,8 +340,6 @@ const FoodOrderingSystem = () => {
                 Experience the rich flavors of Nigeria delivered fresh to your doorstep
               </p>
             </div>
-
-            {/* Category Navigation */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">Browse Menu</h3>
@@ -295,7 +347,6 @@ const FoodOrderingSystem = () => {
                   {!loading && `${filteredFoods.length} dishes available`}
                 </div>
               </div>
-              
               <div className="flex flex-wrap gap-2">
                 {categories.map(category => (
                   <button
@@ -321,16 +372,12 @@ const FoodOrderingSystem = () => {
                 ))}
               </div>
             </div>
-
-            {/* Loading State */}
             {loading && (
               <div className="text-center py-20">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
                 <p className="text-gray-600 text-lg">Loading menu...</p>
               </div>
             )}
-
-            {/* Search Results Info */}
             {!loading && (searchTerm || activeCategory !== 'all') && (
               <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-center justify-between">
@@ -353,8 +400,6 @@ const FoodOrderingSystem = () => {
                 </div>
               </div>
             )}
-
-            {/* Menu Grid */}
             {!loading && filteredFoods.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredFoods.map(item => (
@@ -372,7 +417,6 @@ const FoodOrderingSystem = () => {
                         {formatCategoryName(item.category)}
                       </div>
                     </div>
-
                     <div className="p-4">
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
@@ -383,11 +427,9 @@ const FoodOrderingSystem = () => {
                           <span className="text-xs font-medium text-gray-600">4.8</span>
                         </div>
                       </div>
-                      
                       <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
                         {item.description}
                       </p>
-
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-1 text-gray-500">
                           <Clock className="w-4 h-4" />
@@ -395,7 +437,6 @@ const FoodOrderingSystem = () => {
                         </div>
                         <span className="text-xl font-bold text-green-600">${item.price}</span>
                       </div>
-
                       <button
                         onClick={() => addToCart(item)}
                         className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2 shadow-sm"
@@ -445,7 +486,6 @@ const FoodOrderingSystem = () => {
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-
                 {cart.length === 0 ? (
                   <div className="text-center py-16 flex-1 flex flex-col justify-center">
                     <ShoppingCart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -480,7 +520,6 @@ const FoodOrderingSystem = () => {
                         </div>
                       ))}
                     </div>
-
                     <div className="border-t pt-4 space-y-3">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Subtotal ({getTotalItems()} items)</span>
@@ -488,13 +527,12 @@ const FoodOrderingSystem = () => {
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Delivery Fee</span>
-                        <span className="font-medium">$3.99</span>
+                        <span className="font-medium">${deliveryFee.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between text-lg font-semibold text-gray-900 pt-2 border-t">
                         <span>Total</span>
-                        <span>${(parseFloat(getTotalPrice()) + 3.99).toFixed(2)}</span>
+                        <span>${(parseFloat(getTotalPrice()) + deliveryFee).toFixed(2)}</span>
                       </div>
-                      
                       <button
                         onClick={() => setShowCheckout(true)}
                         className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium transition-colors mt-4"
@@ -527,9 +565,7 @@ const FoodOrderingSystem = () => {
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-
                 <form onSubmit={handleSubmit(onCheckoutSubmit)} className="space-y-6">
-                  {/* Delivery Information */}
                   <div>
                     <h3 className="text-lg font-medium mb-4 flex items-center text-gray-900">
                       <MapPin className="w-5 h-5 mr-2 text-green-600" />
@@ -546,7 +582,6 @@ const FoodOrderingSystem = () => {
                         />
                         {errors.streetAddress && <p className="text-red-500 text-xs mt-1">{errors.streetAddress.message}</p>}
                       </div>
-
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
@@ -563,13 +598,16 @@ const FoodOrderingSystem = () => {
                           <input
                             type="text"
                             placeholder="ZIP Code"
-                            {...register('zipCode', { required: 'ZIP code is required' })}
+                            {...register('zipCode', {
+                              required: 'ZIP code is required',
+                              validate: value =>
+                                VALID_ZIP_CODES.includes(value) || 'Delivery is not available to this ZIP code',
+                            })}
                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
                           />
                           {errors.zipCode && <p className="text-red-500 text-xs mt-1">{errors.zipCode.message}</p>}
                         </div>
                       </div>
-
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                         <div className="relative">
@@ -587,8 +625,6 @@ const FoodOrderingSystem = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/* Order Summary */}
                   <div className="bg-gray-50 p-4 rounded-lg border">
                     <h3 className="text-lg font-medium mb-4 text-gray-900">Order Summary</h3>
                     <div className="space-y-2">
@@ -605,22 +641,20 @@ const FoodOrderingSystem = () => {
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600">Delivery Fee</span>
-                          <span className="text-gray-900">$3.99</span>
+                          <span className="text-gray-900">${deliveryFee.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between font-semibold text-lg text-gray-900 pt-1 border-t border-gray-200">
                           <span>Total</span>
-                          <span>${(parseFloat(getTotalPrice()) + 3.99).toFixed(2)}</span>
+                          <span>${(parseFloat(getTotalPrice()) + deliveryFee).toFixed(2)}</span>
                         </div>
                       </div>
                     </div>
                   </div>
-
-                  {/* Payment Button */}
                   <button
                     type="submit"
                     className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-lg font-semibold transition-colors duration-200 text-lg shadow-sm"
                   >
-                    Complete Order - ${(parseFloat(getTotalPrice()) + 3.99).toFixed(2)}
+                    Complete Order - ${(parseFloat(getTotalPrice()) + deliveryFee).toFixed(2)}
                   </button>
                 </form>
               </div>
@@ -628,7 +662,7 @@ const FoodOrderingSystem = () => {
           </div>
         )}
 
-        {/* Footer */}
+        {/* Footer unchanged */}
         <footer className="bg-white border-t mt-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -656,7 +690,6 @@ const FoodOrderingSystem = () => {
                   </div>
                 </div>
               </div>
-              
               <div>
                 <h4 className="font-semibold text-gray-900 mb-4">Quick Links</h4>
                 <ul className="space-y-2 text-sm text-gray-600">
@@ -666,7 +699,6 @@ const FoodOrderingSystem = () => {
                   <li><a href="#faq" className="hover:text-green-600 transition-colors">FAQ</a></li>
                 </ul>
               </div>
-              
               <div>
                 <h4 className="font-semibold text-gray-900 mb-4">Customer Care</h4>
                 <ul className="space-y-2 text-sm text-gray-600">
@@ -677,7 +709,6 @@ const FoodOrderingSystem = () => {
                 </ul>
               </div>
             </div>
-            
             <div className="border-t border-gray-200 mt-8 pt-8 text-center">
               <p className="text-sm text-gray-500">
                 © 2025 9jabuka. All rights reserved. | Bringing authentic Nigerian flavors to your table.
