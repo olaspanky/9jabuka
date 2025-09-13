@@ -399,7 +399,7 @@ const ReservationCateringPage = () => {
                   <h4 className="text-lg font-medium text-gray-900 mb-2">General Inquiries</h4>
                   <div className="flex items-center space-x-2 text-gray-600">
                     <Mail className="w-4 h-4" />
-                    <a href="mailto:info@9jabukarestaurant.com" className="hover:text-green-600">info@9jabukarestaurant.com</a>
+                    <a href="mailto:info@9jabukarestaurant.com" className="hover:text-green-600">9jabuka00@gmail.com</a>
                   </div>
                 </div>
               </div>
@@ -409,59 +409,58 @@ const ReservationCateringPage = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">9J</span>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">9jabuka</h3>
-                  <p className="text-sm text-gray-600">Authentic Nigerian Cuisine</p>
-                </div>
-              </div>
-              <p className="text-gray-600 mb-4">
-                Bringing you the authentic taste of Nigeria with fresh ingredients and traditional recipes passed down through generations.
-              </p>
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
-                <div className="flex items-center space-x-1">
-                  <Clock className="w-4 h-4" />
-                  <span>Daily 11AM - 10PM</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Phone className="w-4 h-4" />
-                  <span>+1 (555) 123-4567</span>
-                </div>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li><a href="/#menu" className="hover:text-green-600 transition-colors">Menu</a></li>
-                <li><a href="/#about" className="hover:text-green-600 transition-colors">About Us</a></li>
-                <li><a href="/#contact" className="hover:text-green-600 transition-colors">Contact</a></li>
-                <li><a href="/#faq" className="hover:text-green-600 transition-colors">FAQ</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Customer Care</h4>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li><a href="/#support" className="hover:text-green-600 transition-colors">Support</a></li>
-                <li><a href="/#delivery" className="hover:text-green-600 transition-colors">Delivery Info</a></li>
-                <li><a href="/#returns" className="hover:text-green-600 transition-colors">Returns</a></li>
-                <li><a href="/#privacy" className="hover:text-green-600 transition-colors">Privacy Policy</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-200 mt-8 pt-8 text-center">
-            <p className="text-sm text-gray-500">
-              © 2025 9jabuka. All rights reserved. | Bringing authentic Nigerian flavors to your table.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <footer className="bg-white border-t mt-16">
+               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                   <div className="col-span-1 md:col-span-2">
+                     <div className="flex items-center space-x-3 mb-4">
+                       <div >
+      <div>
+                      <img src="/9ja.png" alt="9jabuka Logo" className="h-8 w-auto" />
+                     </div>                  </div>
+                      
+                     </div>
+                     <p className="text-gray-600 mb-4">
+                       Bringing you the authentic taste of Nigeria with fresh ingredients and traditional recipes passed down through generations.
+                     </p>
+                     <div className="flex items-center space-x-4 text-sm text-gray-600">
+                       <div className="flex items-center space-x-1">
+                         <Clock className="w-4 h-4" />
+                         <span>Daily 9AM - 7:30PM</span>
+                       </div>
+                       <div className="flex items-center space-x-1">
+                         <Phone className="w-4 h-4" />
+                         <span>973-753 4447</span>
+                         <span>862-291-6464</span>
+                       </div>
+                     </div>
+                   </div>
+                   <div>
+                     <h4 className="font-semibold text-gray-900 mb-4">Quick Links</h4>
+                     <ul className="space-y-2 text-sm text-gray-600">
+                       <li><a href="#menu" className="hover:text-green-600 transition-colors">Menu</a></li>
+                       <li><a href="#about" className="hover:text-green-600 transition-colors">About Us</a></li>
+                       <li><a href="#contact" className="hover:text-green-600 transition-colors">Contact</a></li>
+                       <li><a href="#faq" className="hover:text-green-600 transition-colors">FAQ</a></li>
+                     </ul>
+                   </div>
+                   <div>
+                     <h4 className="font-semibold text-gray-900 mb-4">Customer Care</h4>
+                     <ul className="space-y-2 text-sm text-gray-600">
+                       <li><a href="#support" className="hover:text-green-600 transition-colors">Support</a></li>
+                       <li><a href="#delivery" className="hover:text-green-600 transition-colors">Delivery Info</a></li>
+                       <li><a href="#returns" className="hover:text-green-600 transition-colors">Returns</a></li>
+                       <li><a href="#privacy" className="hover:text-green-600 transition-colors">Privacy Policy</a></li>
+                     </ul>
+                   </div>
+                 </div>
+                 <div className="border-t border-gray-200 mt-8 pt-8 text-center">
+                   <p className="text-sm text-gray-500">
+                     © 2025 9jabuka. All rights reserved. | Bringing authentic Nigerian flavors to your table.
+                   </p>
+                 </div>
+               </div>
+             </footer>
     </div>
   );
 };

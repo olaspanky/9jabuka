@@ -668,13 +668,11 @@ const FoodOrderingSystem = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               <div className="col-span-1 md:col-span-2">
                 <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">9J</span>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">9jabuka</h3>
-                    <p className="text-sm text-gray-600">Authentic Nigerian Cuisine</p>
-                  </div>
+                  <div >
+ <div>
+                 <img src="/9ja.png" alt="9jabuka Logo" className="h-8 w-auto" />
+                </div>                  </div>
+                 
                 </div>
                 <p className="text-gray-600 mb-4">
                   Bringing you the authentic taste of Nigeria with fresh ingredients and traditional recipes passed down through generations.
@@ -682,11 +680,12 @@ const FoodOrderingSystem = () => {
                 <div className="flex items-center space-x-4 text-sm text-gray-600">
                   <div className="flex items-center space-x-1">
                     <Clock className="w-4 h-4" />
-                    <span>Daily 11AM - 10PM</span>
+                    <span>Daily 9AM - 7:30PM</span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <Phone className="w-4 h-4" />
-                    <span>+1 (555) 123-4567</span>
+                    <span>973-753 4447</span>
+                    <span>862-291-6464</span>
                   </div>
                 </div>
               </div>
