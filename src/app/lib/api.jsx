@@ -38,6 +38,11 @@ export const updateFood = async (id, formData) => {
   return response.data;
 };
 
+export const deleteFood = async (id) => {
+  const response = await api.delete(`/foods/${id}`);
+  return response.data;
+};
+
 export const placeOrder = async (orderData) => {
   const response = await api.post('/orders/place', orderData);
   return response.data;

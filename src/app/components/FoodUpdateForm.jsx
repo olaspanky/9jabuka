@@ -3,8 +3,8 @@
 import { useForm } from 'react-hook-form';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Upload, Image, DollarSign, Clock, Tag, FileText, ChefHat, Check, AlertCircle, X } from 'lucide-react';
-import { updateFood, getFoodById } from '../lib/api'; // Assume getFoodById fetches food item by ID
+import { Upload, Image, DollarSign, Clock, Tag, FileText, ChefHat, Check, AlertCircle, X, Trash2, AlertTriangle } from 'lucide-react';
+import { updateFood, getFoodById, deleteFood } from '../lib/api'; // Added deleteFood import
 
 export default function FoodUpdateForm() {
   const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm();
@@ -13,6 +13,8 @@ export default function FoodUpdateForm() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { id } = useParams(); // Get food ID from URL params (Next.js)
   const router = useRouter();
 
@@ -101,6 +103,30 @@ export default function FoodUpdateForm() {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      setError(null);
+      await deleteFood(id);
+      setSuccess('Food item deleted successfully! The dish has been removed from 9jabuka.');
+      setTimeout(() => router.push('/admin/food'), 2000); // Redirect to food list after deletion
+    } catch (err) {
+      console.error('Error deleting food item:', err);
+      setError(err.response?.data?.message || 'Failed to delete food item. Please try again.');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  };
+
+  const confirmDelete = () => {
+    setShowDeleteModal(true);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen w-[100vw] bg-gradient-to-br from-green-800 via-red-900 to-orange-900 flex items-center justify-center">
@@ -183,6 +209,7 @@ export default function FoodUpdateForm() {
                           setValue('image', null);
                         }}
                         className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                        title="Remove current image"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -349,13 +376,14 @@ export default function FoodUpdateForm() {
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <div className="pt-6">
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-6">
+                {/* Update Button */}
                 <button
                   type="button"
                   onClick={handleSubmit(onSubmit)}
                   disabled={isUpdating}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 disabled:from-gray-400 disabled:to-gray-500 text-white py-4 px-6 rounded-2xl font-bold transition-all duration-300 hover:scale-105 disabled:scale-100 shadow-lg flex items-center justify-center space-x-3 text-lg"
+                  className="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 disabled:from-gray-400 disabled:to-gray-500 text-white py-4 px-6 rounded-2xl font-bold transition-all duration-300 hover:scale-105 disabled:scale-100 shadow-lg flex items-center justify-center space-x-3 text-lg"
                 >
                   {isUpdating ? (
                     <>
@@ -368,6 +396,17 @@ export default function FoodUpdateForm() {
                       <span>Update Dish</span>
                     </>
                   )}
+                </button>
+
+                {/* Delete Button */}
+                <button
+                  type="button"
+                  onClick={confirmDelete}
+                  disabled={isUpdating || isDeleting}
+                  className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-gray-400 disabled:to-gray-500 text-white py-4 px-6 rounded-2xl font-bold transition-all duration-300 hover:scale-105 disabled:scale-100 shadow-lg flex items-center justify-center space-x-3 text-lg"
+                >
+                  <Trash2 className="w-5 h-5" />
+                  <span>Delete Dish</span>
                 </button>
               </div>
             </div>
@@ -383,6 +422,66 @@ export default function FoodUpdateForm() {
           </p>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 max-w-md w-full">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-red-600 to-red-700 p-6 rounded-t-2xl text-white">
+              <div className="flex items-center space-x-3">
+                <AlertTriangle className="w-8 h-8" />
+                <div>
+                  <h3 className="text-xl font-bold">Delete Dish</h3>
+                  <p className="text-red-100">This action cannot be undone</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                <h4 className="text-2xl font-bold text-gray-800 mb-2">
+                  Are you sure you want to delete this dish?
+                </h4>
+                <p className="text-gray-600 mb-4">
+                  This will permanently remove the dish from your menu and cannot be recovered. 
+                  This action will also remove the associated image from storage.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={cancelDelete}
+                  disabled={isDeleting}
+                  className="flex-1 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 text-gray-800 py-3 px-4 rounded-xl font-semibold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-gray-400 disabled:to-gray-500 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2"
+                >
+                  {isDeleting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Deleting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      <span>Delete</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
