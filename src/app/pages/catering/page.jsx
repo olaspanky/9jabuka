@@ -8,9 +8,9 @@ import { Home, MapPin, Phone, Mail, Calendar, Users, Clock, Menu, X } from 'luci
 
 // Placeholder images (replace with actual URLs hosted on your server or CDN)
 const CATERING_IMAGES = [
-  '/r1.jpg', // Party
+  '/r1.jpeg', // Party
   'https://images.unsplash.com/photo-1519671282429-b44660ead0a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // Event setup
-  '/r2.jpg', // Party
+  '/r2.jpeg', // Party
 ];
 
 const ReservationCateringPage = () => {
