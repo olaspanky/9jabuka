@@ -290,9 +290,9 @@ const FoodOrderingSystem = () => {
                   />
                 </div>
                 <nav className="flex flex-col space-y-2">
-                  <a href="#menu" className="text-gray-700 hover:text-green-600 font-medium py-2">Menu</a>
-                  <a href="#about" className="text-gray-700 hover:text-green-600 font-medium py-2">About</a>
-                  <a href="#contact" className="text-gray-700 hover:text-green-600 font-medium py-2">Contact</a>
+                  <a href="#menu" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Menu</a>
+                <a href="/pages/catering" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Reservation and catering</a>
+                <a href="#contact" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Contact</a>
                 </nav>
               </div>
             </div>

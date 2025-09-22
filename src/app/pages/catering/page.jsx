@@ -83,10 +83,9 @@ const ReservationCateringPage = () => {
                 </div>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Home</a>
-              <a href="/#menu" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Menu</a>
-              <a href="/reservation-catering" className="text-green-600 font-medium">Reservations & Catering</a>
-              <a href="/#contact" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Contact</a>
+         <a href="#menu" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Menu</a>
+                <a href="/pages/catering" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Reservation and catering</a>
+                <a href="#contact" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Contact</a>
             </nav>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -100,10 +99,9 @@ const ReservationCateringPage = () => {
           <div className="md:hidden bg-white border-t">
             <div className="px-4 py-3 space-y-3">
               <nav className="flex flex-col space-y-2">
-                <a href="/" className="text-gray-700 hover:text-green-600 font-medium py-2">Home</a>
-                <a href="/#menu" className="text-gray-700 hover:text-green-600 font-medium py-2">Menu</a>
-                <a href="/reservation-catering" className="text-green-600 font-medium py-2">Reservations & Catering</a>
-                <a href="/#contact" className="text-gray-700 hover:text-green-600 font-medium py-2">Contact</a>
+                <a href="#menu" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Menu</a>
+                <a href="/pages/catering" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Reservation and catering</a>
+                <a href="#contact" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Contact</a>
               </nav>
             </div>
           </div>
