@@ -69,6 +69,10 @@ const ReservationCateringPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+        <div className="absolute inset-0 bg-[url('/bg2.jpg')] lg:bg-[url('/bg.jpg')] fixed bg-cover bg-center bg-black/50"></div> 
+          <div className="relative z-10">
+
+
       {/* Header */}
       <header className="bg-white shadow-sm border-b fixed w-full z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -113,7 +117,7 @@ const ReservationCateringPage = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-20 left-1/2 transform -translate-x-1/2 z-40 max-w-md w-full mx-4"
+            className="fixed top-20 left-1/2 transform -translate-x-1/2 z-99 max-w-md w-full mx-4"
           >
             <div className={`p-4 rounded-lg shadow-lg ${
               reservationSuccess || cateringSuccess ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
@@ -149,22 +153,10 @@ const ReservationCateringPage = () => {
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className="pt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="pt-48 z-99">
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-12">
           {/* Hero Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Reservations & Catering
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Book a table or plan your event with 9jabuka's authentic Nigerian cuisine
-            </p>
-          </motion.div>
+         
 
          
 
@@ -461,6 +453,7 @@ const ReservationCateringPage = () => {
                  </div>
                </div>
              </footer>
+    </div>
     </div>
   );
 };
