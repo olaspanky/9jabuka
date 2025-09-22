@@ -8,9 +8,9 @@ import { Home, MapPin, Phone, Mail, Calendar, Users, Clock, Menu, X } from 'luci
 
 // Placeholder images (replace with actual URLs hosted on your server or CDN)
 const CATERING_IMAGES = [
-  'https://images.unsplash.com/photo-1555244162-803834f70033?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // Party
+  '/r1.jpg', // Party
   'https://images.unsplash.com/photo-1519671282429-b44660ead0a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // Event setup
-  'https://images.unsplash.com/photo-1555244162-803834f70033?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // Party
+  '/r2.jpg', // Party
 ];
 
 const ReservationCateringPage = () => {
@@ -69,7 +69,7 @@ const ReservationCateringPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-        <div className="absolute inset-0 bg-[url('/bg2.jpg')] lg:bg-[url('/bg.jpg')] fixed bg-cover bg-center bg-black/50"></div> 
+        <div className="absolute  inset-0 bg-[url('/bg2.jpg')] lg:bg-[url('/bg.jpg')] fixed bg-cover bg-center bg-black/50"></div> 
           <div className="relative z-10">
 
 
@@ -153,11 +153,13 @@ const ReservationCateringPage = () => {
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className="pt-48 z-99">
+      <main className=" z-99">
         <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-12">
           {/* Hero Section */}
          
-
+ <div>
+              <img src="/9ja.png" alt=''/>
+            </div>
          
 
           {/* Catering Section */}
