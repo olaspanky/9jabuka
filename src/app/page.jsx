@@ -42,8 +42,6 @@ const RESTAURANT_LOCATIONS = [
 
 // Placeholder function to calculate distance (replace with actual API call)
 const calculateDistance = async (userAddress, restaurantLocations) => {
-  // Mock distance calculation (in miles) - replace with Google Maps Distance Matrix API
-  // For demonstration, assume distances based on ZIP code
   const zipToDistance = {
     '07103': 0, // Same as Springfield Ave
     '07111': 2, // Close to Clinton Ave
@@ -63,8 +61,16 @@ const calculateDistance = async (userAddress, restaurantLocations) => {
   const userZip = userAddress.match(/\b\d{5}\b/)?.[0]; // Extract ZIP code
   const distance = zipToDistance[userZip] || 5; // Default to 5 miles if ZIP not found
 
-  // Calculate delivery fee: $2 base + $1 per mile
-  const deliveryFee = (2 + distance).toFixed(2);
+  // Custom delivery fee logic
+  let deliveryFee;
+  if (distance === 1) {
+    deliveryFee = 8.00; // $8 for 1 mile
+  } else if (distance === 2) {
+    deliveryFee = 10.00; // $10 for 2 miles
+  } else {
+    deliveryFee = (2 + distance).toFixed(2); // Default: $2 base + $1 per mile for other distances
+  }
+
   return { distance, deliveryFee };
 };
 
