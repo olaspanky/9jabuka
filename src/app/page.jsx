@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import { getFoods, placeOrder } from '../../src/app/lib/api';
+import Link from 'next/link';
 
 // Initialize Stripe with your publishable key
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
@@ -238,12 +239,14 @@ const FoodOrderingSystem = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center space-x-3">
-               
+               <Link href="https://9jabukarestaurant.com">
                 <div>
                  <img src="/9ja.png" alt="9jabuka Logo" className="h-8 w-auto" />
                 </div>
+                </Link>
               </div>
               <nav className="hidden md:flex items-center space-x-8">
+                <a href="https://9jabukarestaurant.com" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Home</a>
                 <a href="#menu" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Menu</a>
                 <a href="/pages/catering" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Reservation and catering</a>
                 <a href="#contact" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Contact</a>
@@ -296,7 +299,7 @@ const FoodOrderingSystem = () => {
                   />
                 </div>
                 <nav className="flex flex-col space-y-2">
-                  <a href="#menu" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Menu</a>
+                  <a href="/" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Menu</a>
                 <a href="/pages/catering" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Reservation and catering</a>
                 <a href="#contact" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Contact</a>
                 </nav>

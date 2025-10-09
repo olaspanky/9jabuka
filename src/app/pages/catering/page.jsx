@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, MapPin, Phone, Mail, Calendar, Users, Clock, Menu, X } from 'lucide-react';
+import Link from 'next/link';
 
 // Placeholder images (replace with actual URLs hosted on your server or CDN)
 const CATERING_IMAGES = [
@@ -78,9 +79,11 @@ const ReservationCateringPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
+                <Link href="https://9jabukarestaurant.com">
                 <div>
                  <img src="/9ja.png" alt="9jabuka Logo" className="h-8 w-auto" />
                 </div>
+                </Link>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
          <a href="#menu" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Menu</a>
@@ -99,6 +102,8 @@ const ReservationCateringPage = () => {
           <div className="md:hidden bg-white border-t">
             <div className="px-4 py-3 space-y-3">
               <nav className="flex flex-col space-y-2">
+                                <a href="https://9jabukarestaurant.com" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Home</a>
+
                 <a href="#menu" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Menu</a>
                 <a href="/pages/catering" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Reservation and catering</a>
                 <a href="#contact" className="text-gray-700 hover:text-green-600 font-medium transition-colors">Contact</a>
