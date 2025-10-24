@@ -3,8 +3,8 @@
 import { useForm } from 'react-hook-form';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Upload, Image, DollarSign, Clock, Tag, FileText, ChefHat, Check, AlertCircle, X, Trash2, AlertTriangle } from 'lucide-react';
-import { updateFood, getFoodById, deleteFood } from '../lib/api'; // Added deleteFood import
+import { Upload, Image, DollarSign, Clock, Tag, FileText, ChefHat, Check, AlertCircle, X, Trash2, AlertTriangle, Plus } from 'lucide-react';
+import { updateFood, getFoodById, deleteFood } from '../lib/api';
 
 export default function FoodUpdateForm() {
   const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm();
@@ -15,7 +15,9 @@ export default function FoodUpdateForm() {
   const [imagePreview, setImagePreview] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const { id } = useParams(); // Get food ID from URL params (Next.js)
+  const [hasSizes, setHasSizes] = useState(false);
+  const [sizes, setSizes] = useState([]);
+  const { id } = useParams();
   const router = useRouter();
 
   const watchedImage = watch('image');
@@ -35,6 +37,9 @@ export default function FoodUpdateForm() {
     'Frozen Soup',
   ];
 
+  // Size options
+  const sizeOptions = ['Half Pan', 'Full Pan', '2 Litres'];
+
   // Fetch food item data on mount
   useEffect(() => {
     const fetchFood = async () => {
@@ -47,7 +52,17 @@ export default function FoodUpdateForm() {
         setValue('price', food.price);
         setValue('category', food.category);
         setValue('cookingTime', food.cookingTime);
-        setImagePreview(food.imageUrl); // Set initial image preview
+        setImagePreview(food.imageUrl);
+        
+        // Load sizes if they exist
+        if (food.hasSizes && food.sizes && food.sizes.length > 0) {
+          setHasSizes(true);
+          setSizes(food.sizes.map(size => ({
+            name: size.name,
+            price: size.price.toString()
+          })));
+        }
+        
         setIsLoading(false);
       } catch (err) {
         console.error('Error fetching food item:', err);
@@ -73,6 +88,25 @@ export default function FoodUpdateForm() {
     }
   }, [watchedImage, id]);
 
+  // Add a size
+  const addSize = () => {
+    if (sizes.length < 3) {
+      setSizes([...sizes, { name: '', price: '' }]);
+    }
+  };
+
+  // Remove a size
+  const removeSize = (index) => {
+    setSizes(sizes.filter((_, i) => i !== index));
+  };
+
+  // Update size data
+  const updateSize = (index, field, value) => {
+    const updatedSizes = [...sizes];
+    updatedSizes[index][field] = value;
+    setSizes(updatedSizes);
+  };
+
   const onSubmit = async (data) => {
     try {
       setIsUpdating(true);
@@ -89,14 +123,37 @@ export default function FoodUpdateForm() {
         formData.append('image', data.image[0]);
       }
 
+      // Add sizes if enabled
+      if (hasSizes && sizes.length > 0) {
+        // Filter out empty sizes and validate
+        const validSizes = sizes.filter(size => size.name && size.price);
+        
+        if (validSizes.length === 0) {
+          throw new Error('Please add at least one size with a price or disable sizes');
+        }
+
+        // Convert to proper format
+        const sizesData = validSizes.map(size => ({
+          name: size.name,
+          price: parseFloat(size.price)
+        }));
+
+        formData.append('sizes', JSON.stringify(sizesData));
+        formData.append('hasSizes', 'true');
+      } else {
+        // Clear sizes if disabled
+        formData.append('sizes', JSON.stringify([]));
+        formData.append('hasSizes', 'false');
+      }
+
       console.log('Sending form data:', Object.fromEntries(formData));
       const response = await updateFood(id, formData);
       setSuccess('Food item updated successfully! The dish has been updated on 9jabuka.');
       setError(null);
-      setTimeout(() => router.push('/admin/food'), 2000); // Redirect to food list after success
+      setTimeout(() => router.push('/admin/foodlist'), 2000);
     } catch (err) {
       console.error('Frontend error:', err);
-      setError(err.response?.data?.message || 'Failed to update food item. Please try again.');
+      setError(err.response?.data?.message || err.message || 'Failed to update food item. Please try again.');
       setSuccess(null);
     } finally {
       setIsUpdating(false);
@@ -109,7 +166,7 @@ export default function FoodUpdateForm() {
       setError(null);
       await deleteFood(id);
       setSuccess('Food item deleted successfully! The dish has been removed from 9jabuka.');
-      setTimeout(() => router.push('/admin/food'), 2000); // Redirect to food list after deletion
+      setTimeout(() => router.push('/admin/foodlist'), 2000);
     } catch (err) {
       console.error('Error deleting food item:', err);
       setError(err.response?.data?.message || 'Failed to delete food item. Please try again.');
@@ -206,10 +263,9 @@ export default function FoodUpdateForm() {
                         type="button"
                         onClick={() => {
                           setImagePreview(null);
-                          setValue('image', null);
+                          reset({ ...watch(), image: null });
                         }}
                         className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
-                        title="Remove current image"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -228,8 +284,8 @@ export default function FoodUpdateForm() {
                       className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-green-500 transition-colors bg-gray-50 hover:bg-green-50"
                     >
                       <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                      <span className="text-sm font-medium text-gray-600">Click to upload new image (optional)</span>
-                      <span className="text-xs text-gray-500">JPEG, PNG (Max 5MB)</span>
+                      <span className="text-sm font-medium text-gray-600">Click to upload new image</span>
+                      <span className="text-xs text-gray-500 mt-1">JPEG, JPG or PNG (max 5MB)</span>
                     </label>
                   </div>
                   {errors.image && (
@@ -270,7 +326,7 @@ export default function FoodUpdateForm() {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
                     <DollarSign className="w-4 h-4 mr-2 text-green-600" />
-                    Price (USD)
+                    {hasSizes ? 'Base Price (USD)' : 'Price (USD)'}
                   </label>
                   <input
                     id="price"
@@ -288,6 +344,11 @@ export default function FoodUpdateForm() {
                     <p className="text-red-500 text-sm mt-1 flex items-center">
                       <AlertCircle className="w-4 h-4 mr-1" />
                       {errors.price.message}
+                    </p>
+                  )}
+                  {hasSizes && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      This will be used if no size is selected
                     </p>
                   )}
                 </div>
@@ -344,6 +405,100 @@ export default function FoodUpdateForm() {
                     </p>
                   )}
                 </div>
+              </div>
+
+              {/* Pan Sizes Section */}
+              <div className="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={hasSizes}
+                        onChange={(e) => {
+                          setHasSizes(e.target.checked);
+                          if (!e.target.checked) {
+                            setSizes([]);
+                          }
+                        }}
+                        className="w-5 h-5 text-green-600 rounded focus:ring-green-500"
+                      />
+                      <span className="ml-3 text-sm font-semibold text-gray-700">
+                        This dish has different pan sizes
+                      </span>
+                    </label>
+                    <p className="text-xs text-gray-500 ml-8 mt-1">
+                      Enable this for dishes available in Half Pan, Full Pan, or 2 Litres
+                    </p>
+                  </div>
+                </div>
+
+                {hasSizes && (
+                  <div className="space-y-4 mt-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-semibold text-gray-700">Pan Sizes & Prices</h4>
+                      {sizes.length < 3 && (
+                        <button
+                          type="button"
+                          onClick={addSize}
+                          className="flex items-center space-x-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Add Size</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {sizes.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        <p className="text-sm">No sizes added yet. Click "Add Size" to start.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {sizes.map((size, index) => (
+                          <div key={index} className="flex gap-3 items-start bg-white p-4 rounded-lg border border-gray-200">
+                            <div className="flex-1">
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Size Type
+                              </label>
+                              <select
+                                value={size.name}
+                                onChange={(e) => updateSize(index, 'name', e.target.value)}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900"
+                              >
+                                <option value="">Select size...</option>
+                                {sizeOptions.map(option => (
+                                  <option key={option} value={option}>{option}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div className="flex-1">
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Price (USD)
+                              </label>
+                              <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                placeholder="0.00"
+                                value={size.price}
+                                onChange={(e) => updateSize(index, 'price', e.target.value)}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeSize(index)}
+                              className="mt-6 p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Description */}
