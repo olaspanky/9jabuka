@@ -353,13 +353,13 @@ const FoodOrderingSystem = () => {
             <div className="hidden lg:flex gap-8">
               {/* Fixed Sidebar – Categories */}
               <aside className="w-64 flex-shrink-0 sticky top-24 self-start bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Categories</h3>
-                <div className="space-y-2">
+                <h3 className="text-md font-semibold text-gray-900 mb-4">Categories</h3>
+                <div className="xl:space-y-2 space-y-1">
                   {categories.map(cat => (
                     <button
                       key={cat}
                       onClick={() => setActiveCategory(cat)}
-                      className={`w-full text-left px-4 py-2 rounded-lg font-medium transition-all ${
+                      className={`w-full text-md text-left px-4 py-2 rounded-lg font-medium transition-all ${
                         activeCategory === cat
                           ? 'bg-green-600 text-white shadow-sm'
                           : 'text-gray-700 hover:bg-gray-100'
