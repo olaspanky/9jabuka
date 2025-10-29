@@ -410,9 +410,16 @@ const FoodOrderingSystem = () => {
                               <Clock className="w-4 h-4" />
                               <span className="text-sm">{food.time}</span>
                             </div>
-                            <span className="text-xl font-bold text-green-600">
-                              {food.hasSizes ? `From $${food.panSizes[0].price.toFixed(2)}` : `$${food.price.toFixed(2)}`}
+
+                            <div className='flex flex-col'>
+  <span className="text-xl font-bold text-green-600">
+                              { `$${food.price.toFixed(2)}`}
                             </span>
+                            <span className="text-sm font-bold text-green-600">
+                               {food.hasSizes ? `other sizes From $${food.panSizes[0].price.toFixed(2)}` : ``}
+                            </span>
+                            </div>
+                          
                           </div>
                           <button
                             onClick={() => addToCart(food)}
