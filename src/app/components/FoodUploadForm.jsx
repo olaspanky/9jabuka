@@ -32,7 +32,7 @@ export default function FoodUploadForm() {
   }, [watchedImage]);
 
   // Size options
-  const sizeOptions = ['Half Pan', 'Full Pan', '2 Litres'];
+  const sizeOptions = ['plate ','Half Pan', 'Full Pan', '2 Litres'];
 
   // Add a size
   const addSize = () => {
@@ -112,7 +112,7 @@ export default function FoodUploadForm() {
 
   // Updated categories
   const categories = [
-    'Mains',
+    'Special Rice',
     'Combination Platter',
     'Beans',
     'Soups & Swallow',
@@ -122,7 +122,7 @@ export default function FoodUploadForm() {
     'Pastries',
     'Drinks',
     'Breakfast Menu',
-    'Frozen Soup'
+    'Special soup', 'Weekend bowl'
   ];
 
   return (

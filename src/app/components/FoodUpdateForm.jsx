@@ -24,7 +24,7 @@ export default function FoodUpdateForm() {
 
   // Categories (consistent with FoodUploadForm)
   const categories = [
-    'Mains',
+    'Special Rice',
     'Combination Platter',
     'Beans',
     'Soups & Swallow',
@@ -34,11 +34,11 @@ export default function FoodUpdateForm() {
     'Pastries',
     'Drinks',
     'Breakfast Menu',
-    'Frozen Soup',
+    'Special soup', 'Weekend bowl'
   ];
 
   // Size options
-  const sizeOptions = ['Half Pan', 'Full Pan', '2 Litres'];
+  const sizeOptions = ['plate ','Half Pan', 'Full Pan', '2 Litres'];
 
   // Fetch food item data on mount
   useEffect(() => {
