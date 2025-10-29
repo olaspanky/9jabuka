@@ -411,15 +411,16 @@ const FoodOrderingSystem = () => {
                               <span className="text-sm">{food.time}</span>
                             </div>
 
-                            <div className='flex flex-col'>
-  <span className="text-xl font-bold text-green-600">
-                              { `$${food.price.toFixed(2)}`}
-                            </span>
-                            <span className="text-sm font-bold text-green-600">
-                               {food.hasSizes ? `other sizes From $${food.panSizes[0].price.toFixed(2)}` : ``}
-                            </span>
-                            </div>
-                          
+                           <div className="flex flex-col items-end text-right">
+  <p className="text-xl font-bold text-green-600">
+    ${food.price.toFixed(2)}
+  </p>
+  {food.hasSizes && food.panSizes?.length > 0 && (
+    <p className="text-xs text-gray-500 mt-0.5">
+      More sizes from ${Math.min(...food.panSizes.map(size => size.price)).toFixed(2)}
+    </p>
+  )}
+</div>
                           </div>
                           <button
                             onClick={() => addToCart(food)}
