@@ -34,7 +34,7 @@ export default function FoodUpdateForm() {
     'Pastries',
     'Drinks',
     'Breakfast Menu',
-    'Special soup', 'Weekend bowl'
+    'Special soup', 'Weekend bowl', 'pan', 'litres'
   ];
 
   // Size options
@@ -90,7 +90,7 @@ export default function FoodUpdateForm() {
 
   // Add a size
   const addSize = () => {
-    if (sizes.length < 3) {
+    if (sizes.length < 4) {
       setSizes([...sizes, { name: '', price: '' }]);
     }
   };
@@ -437,7 +437,7 @@ export default function FoodUpdateForm() {
                   <div className="space-y-4 mt-4">
                     <div className="flex items-center justify-between">
                       <h4 className="font-semibold text-gray-700">Pan Sizes & Prices</h4>
-                      {sizes.length < 3 && (
+                      {sizes.length < 4 && (
                         <button
                           type="button"
                           onClick={addSize}
