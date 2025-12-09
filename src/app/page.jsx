@@ -211,24 +211,19 @@ const FoodOrderingSystem = () => {
   const getTotalPrice = () => cart.reduce((s, i) => s + i.priceAtOrder * i.quantity, 0).toFixed(2);
 
   // ---------- CHECKOUT ----------
-  const onCheckoutSubmit = async (data) => {
+ const onCheckoutSubmit = async (data) => {
     try {
       const orderData = {
         items: cart.map(i => ({
-          foodId: i.id,
-          name: i.name,
+          food: i.id,  // Changed from foodId to food
           quantity: i.quantity,
-          price: i.priceAtOrder,
-          panSize: i.panSize,
-          specialInstructions: i.note,
         })),
-        customerInfo: data,
-        deliveryFee,
-        totalAmount: (parseFloat(getTotalPrice()) + deliveryFee).toFixed(2),
+        mobileNumber: data.mobileNumber,
+        deliveryLocation: `${data.streetAddress}, ${data.city}, ${data.zipCode}`,
       };
-      const { sessionId } = await createCheckoutSession(orderData);
+      const { id } = await createCheckoutSession(orderData);
       const stripe = await stripePromise;
-      await stripe.redirectToCheckout({ sessionId });
+      await stripe.redirectToCheckout({ sessionId: id });
     } catch (err) {
       setError(err.message || 'Checkout failed');
     }
